@@ -14,7 +14,7 @@ centos7 jumpbox with necessary devops tools installed. Here is the list of tools
 ## Pre-requisites
 - Download and install Visual Studio Code [https://code.visualstudio.com/download]
 - Download and install Oracle Virtual Box [https://www.virtualbox.org/wiki/downloads]
-- Install Vagrant [https://developer.hashicorp.com/vagrant/downloads]
+- Download and install Vagrant [https://www.vagrantup.com/Downloads]
 
 ## How to use
 - `vagrant up --provision`
