@@ -8,5 +8,5 @@ centos7 jumpbox with necessary devops tools installed
 
 
 ## How to use
-`vagrant up --provision`
-`vagrant ssh`
+- `vagrant up --provision`
+- `vagrant ssh`
