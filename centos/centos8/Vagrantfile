@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# generate public key of vagrant user from its private key: ssh-keygen -f ~/.vagrant.d/insecure_private_key -y
+
+VAGRANT_BOX = 'centos/8'
+
+Vagrant.configure("2") do |config|
+  config.vm.box = VAGRANT_BOX
+  config.vm.hostname = "centos8-jumpbox.local"
+  config.vm.provision :shell, :inline => "sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/g' /etc/ssh/sshd_config; sudo systemctl restart sshd;", run: "always"
+  config.vm.network "public_network", bridge: "Intel(R) Wi-Fi 6 AX201 160MHz", ip: "192.168.50.201", hostname: true
+  config.vm.network "private_network", ip: "10.10.10.201"
+  config.vm.network "forwarded_port", id: "ssh", host_ip: "127.0.0.1", host: 2200, guest: 22
+  config.vm.synced_folder "../../../docker/practice", "/home/vagrant/practice", mount_options: ["uid=1000", "gid=1000"]
+  config.ssh.private_key_path = "~/.vagrant.d/id_rsa"
+  config.ssh.forward_agent = true
+
+  config.vm.provider "virtualbox" do |vm|
+    vm.name = "centos8-jumpbox"
+    vm.cpus = 2
+    vm.memory = "2048"
+    vm.linked_clone = true
+    vm.check_guest_additions = false
+  end
+
+  files = [
+    { :source => "~/.vagrant.d/id_rsa", :destination => "~/.ssh/id_rsa"             },
+  ]
+
+  # installing tools
+  config.vm.provision "shell", path: "install-this.sh"
+
+  # copying files from host to VM
+  files.each do |file|
+    config.vm.provision "file", source: file[:source], destination: file[:destination]
+  end # file copy
+
+end

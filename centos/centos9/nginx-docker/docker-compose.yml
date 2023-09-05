@@ -1,0 +1,37 @@
+---
+version: "3.9"
+services:
+  web1:
+    image: "nginx:latest"
+    container_name: web1
+    volumes:
+      - type: bind
+        source: ./htmlfiles
+        target: /usr/share/nginx/html
+        read_only: false
+    ports:
+      - 8080:80
+
+  web2:
+    container_name: web2
+    build:
+      context: .
+      args:
+        HTML_FILES_DIR_SOURCE: ./htmlfiles
+        HTML_FILES_DIR_TARGET: /usr/share/nginx/html
+    image: nginx-with-content:latest
+    # https://www.baeldung.com/ops/docker-compose-interactive-shell
+    stdin_open: true
+    tty: true
+    ports:
+      - 8081:80
+
+  web3:
+    container_name: web3
+    image: nginx-with-content
+    stdin_open: true
+    tty: true
+    ports:
+      - 8082:80
+    depends_on:
+      - web2

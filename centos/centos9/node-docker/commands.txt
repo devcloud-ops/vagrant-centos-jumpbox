@@ -1,0 +1,41 @@
+https://www.youtube.com/watch?v=Ck7baWmnldY&list=PL8VzFQ8k4U1JEu7BLraz8MdKJILJir7oY&index=1
+
+# install node js
+sudo yum install nodejs -y
+sudo dnf install npm -y
+sudo npm install -g express -y
+sudo npm install -g nodemon -y
+sudo npm install -g newman -y
+sudo npm install -g npm@9.6.4 -y
+sudo npm install nodemon --save-dev -y
+
+# install yarn
+curl --silent --location https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
+sudo rpm --import https://dl.yarnpkg.com/rpm/pubkey.gpg
+sudo dnf install yarn -y
+
+# initializing this project: this will create package.json, package-lock.json files and node_modules folder for us
+npm init -y
+npm install express -y
+sudo npm install nodemon --save-dev -y
+
+docker build -t node-cmd-image .
+docker run -it -d -p 4000:3000 -d --name nodex node-cmd-image
+docker run -it -d -p 4000:3000 -v ./:/app -d --name nodex node-cmd-image
+
+# prevent the bind mount to prevent deletion of node_modules folder.
+# hence, create a new named volume that the bind mount cannot touch (/app/node_modules)
+docker run -it -d -p 4000:3000 -v ./:/app -v /app/node_modules -d --name nodex node-cmd-image
+
+# prevent container to add files back to my host but from host to container only
+docker run -it -d -p 4000:3000 -v ./:/app:ro -v /app/node_modules -d --name nodex node-cmd-image
+
+# pass in an env: PORT with value of 3500 to override it
+docker run -it -d --env PORT=3500 -p 4000:3500 -v ./:/app:ro -v /app/node_modules -d --name nodex node-cmd-image
+
+docker exec -it nodex bash
+printenv
+docker rm nodex -fv
+
+# passing in .env file
+docker run -it -d --env-file ./.env -p 4000:3500 -v ./:/app:ro -v /app/node_modules -d --name nodex node-cmd-image
